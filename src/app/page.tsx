@@ -12,6 +12,7 @@ import { PrizePoolTierBar } from "@/components/charts/simple-charts";
 import { mockDb } from "@/lib/mock-db";
 import { Charity, Draw } from "@/types";
 import { formatCurrency, daysUntil } from "@/lib/utils";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
 import {
   Trophy,
   Heart,
@@ -139,7 +140,11 @@ export default function HomePage() {
                     <div className="flex items-baseline justify-between">
                       <span className="text-xs text-neutral-gray font-medium">Estimated Prize Pool</span>
                       <span suppressHydrationWarning className="text-2xl font-bold font-number text-neutral-dark">
-                        {mounted && upcomingDraw ? formatCurrency(upcomingDraw.total_pool) : "$28,000"}
+                        <AnimatedCounter
+                          end={upcomingDraw?.total_pool || 28000}
+                          prefix="$"
+                          duration={1800}
+                        />
                       </span>
                     </div>
                     <PrizePoolTierBar
@@ -172,7 +177,12 @@ export default function HomePage() {
                       <span className="font-medium text-neutral-dark">Junior Golf & Veterans</span>
                     </div>
                     <span suppressHydrationWarning className="font-bold text-charity font-mono">
-                      {mounted ? formatCurrency(totalRaisedYTD) : "$271,950"} YTD
+                      <AnimatedCounter
+                        end={totalRaisedYTD || 271950}
+                        prefix="$"
+                        suffix=" YTD"
+                        duration={1800}
+                      />
                     </span>
                   </div>
 
@@ -190,48 +200,48 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
               
-              <div className="p-5 rounded-standard bg-neutral-light/60 border border-neutral-gray/15">
-                <span className="text-xs font-mono text-neutral-gray uppercase tracking-wider block">
+              <div className="p-5 rounded-standard bg-neutral-light/60 border border-neutral-gray/15 hover:border-gold/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                <span className="text-xs font-mono text-neutral-gray uppercase tracking-wider block group-hover:text-gold-dark transition-colors">
                   Prizes Distributed
                 </span>
-                <span className="text-2xl sm:text-3xl font-extrabold font-number text-gold-dark mt-1 block">
-                  $1,840,000+
+                <span className="text-2xl sm:text-3xl font-extrabold font-number text-gold-dark mt-1 block tracking-tight">
+                  <AnimatedCounter end={1840000} prefix="$" suffix="+" duration={2200} replayOnScroll />
                 </span>
                 <span className="text-[11px] text-neutral-gray mt-1 block">
                   100% verified & timely paid
                 </span>
               </div>
 
-              <div className="p-5 rounded-standard bg-neutral-light/60 border border-neutral-gray/15">
-                <span className="text-xs font-mono text-neutral-gray uppercase tracking-wider block">
+              <div className="p-5 rounded-standard bg-neutral-light/60 border border-neutral-gray/15 hover:border-charity/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                <span className="text-xs font-mono text-neutral-gray uppercase tracking-wider block group-hover:text-charity transition-colors">
                   Charity Impact Funds
                 </span>
-                <span suppressHydrationWarning className="text-2xl sm:text-3xl font-extrabold font-number text-charity mt-1 block">
-                  {mounted ? formatCurrency(totalRaisedYTD) : "$271,950"}
+                <span suppressHydrationWarning className="text-2xl sm:text-3xl font-extrabold font-number text-charity mt-1 block tracking-tight">
+                  <AnimatedCounter end={totalRaisedYTD || 271950} prefix="$" duration={2200} replayOnScroll />
                 </span>
                 <span className="text-[11px] text-neutral-gray mt-1 block">
                   6 vetted partner organizations
                 </span>
               </div>
 
-              <div className="p-5 rounded-standard bg-neutral-light/60 border border-neutral-gray/15">
-                <span className="text-xs font-mono text-neutral-gray uppercase tracking-wider block">
+              <div className="p-5 rounded-standard bg-neutral-light/60 border border-neutral-gray/15 hover:border-primary/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                <span className="text-xs font-mono text-neutral-gray uppercase tracking-wider block group-hover:text-primary transition-colors">
                   Active Golfers
                 </span>
-                <span className="text-2xl sm:text-3xl font-extrabold font-number text-primary mt-1 block">
-                  10,450+
+                <span className="text-2xl sm:text-3xl font-extrabold font-number text-primary mt-1 block tracking-tight">
+                  <AnimatedCounter end={10450} suffix="+" duration={2200} replayOnScroll />
                 </span>
                 <span className="text-[11px] text-neutral-gray mt-1 block">
                   USGA / WHS players logging
                 </span>
               </div>
 
-              <div className="p-5 rounded-standard bg-neutral-light/60 border border-neutral-gray/15">
-                <span className="text-xs font-mono text-neutral-gray uppercase tracking-wider block">
+              <div className="p-5 rounded-standard bg-neutral-light/60 border border-neutral-gray/15 hover:border-neutral-dark/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                <span className="text-xs font-mono text-neutral-gray uppercase tracking-wider block group-hover:text-neutral-dark transition-colors">
                   Lives Supported
                 </span>
-                <span className="text-2xl sm:text-3xl font-extrabold font-number text-neutral-dark mt-1 block">
-                  6,070+
+                <span className="text-2xl sm:text-3xl font-extrabold font-number text-neutral-dark mt-1 block tracking-tight">
+                  <AnimatedCounter end={6070} suffix="+" duration={2200} replayOnScroll />
                 </span>
                 <span className="text-[11px] text-neutral-gray mt-1 block">
                   Youth & veterans empowered
