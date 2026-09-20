@@ -71,9 +71,15 @@ export default function CharityDetailPage() {
   ];
 
   const handleSupportClick = () => {
+    const currentUserId = mockDb.getCurrentUser()?.id;
     const sub = mockDb.getUserSubscription();
-    if (sub) {
-      mockDb.updateSubscription(sub.id, { charity_id: charity.id });
+    if (sub || currentUserId) {
+      mockDb.createOrUpdateSubscription({
+        userId: currentUserId,
+        planType: sub?.plan_type || "monthly",
+        charityId: charity.id,
+        charityPercentage: sub?.charity_contribution_percentage || 20,
+      });
       toast({
         type: "success",
         title: "Primary Charity Updated!",

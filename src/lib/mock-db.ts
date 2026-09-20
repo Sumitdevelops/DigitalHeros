@@ -471,7 +471,16 @@ class MockDatabase {
       if (charities) this.charities = JSON.parse(charities);
 
       const subscriptions = localStorage.getItem("dh_subscriptions");
-      if (subscriptions) this.subscriptions = JSON.parse(subscriptions);
+      if (subscriptions) {
+        try {
+          const parsed = JSON.parse(subscriptions);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            this.subscriptions = parsed;
+          }
+        } catch {
+          this.subscriptions = [...INITIAL_SUBSCRIPTIONS];
+        }
+      }
 
       const draws = localStorage.getItem("dh_draws");
       if (draws) this.draws = JSON.parse(draws);
@@ -501,6 +510,7 @@ class MockDatabase {
       localStorage.setItem("dh_draws", JSON.stringify(this.draws));
       localStorage.setItem("dh_winners", JSON.stringify(this.winners));
       localStorage.setItem("dh_contributions", JSON.stringify(this.contributions));
+      window.dispatchEvent(new Event("storage"));
     } catch (e) {
       console.error("Error saving mock db to storage", e);
     }
@@ -645,7 +655,24 @@ class MockDatabase {
   // --- Subscriptions ---
   getUserSubscription(userId?: string): Subscription | undefined {
     const uid = userId || this.currentUserId;
-    return this.subscriptions.find((s) => s.user_id === uid);
+    if (!uid) {
+      // Unauthenticated demo visitor fallback: return demo subscriber subscription
+      return (
+        this.subscriptions.find((s) => s.user_id === "a1111111-1111-1111-1111-111111111111") ||
+        this.subscriptions[0]
+      );
+    }
+    let sub = this.subscriptions.find((s) => s.user_id === uid);
+    if (!sub) {
+      // Auto-provision an active default subscription for any signed up user so dashboard & charity switches work seamlessly
+      sub = this.createOrUpdateSubscription({
+        userId: uid,
+        planType: "monthly",
+        charityId: "c1111111-1111-1111-1111-111111111111",
+        charityPercentage: 20,
+      });
+    }
+    return sub;
   }
 
   getAllSubscriptions(): Subscription[] {

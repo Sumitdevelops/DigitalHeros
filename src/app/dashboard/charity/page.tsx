@@ -53,28 +53,60 @@ export default function CharityManagementPage() {
     loadCharityData();
   }, []);
 
+  const handleOpenChangeModal = () => {
+    setSelectedNewCharityId(charity?.id || charitiesList[0]?.id || "");
+    setChangeModalOpen(true);
+  };
+
   const handleUpdatePercentage = () => {
-    if (!subscription) return;
-    mockDb.updateSubscription(subscription.id, {
-      charity_contribution_percentage: contributionPercent,
+    const currentUserId = mockDb.getCurrentUser()?.id;
+    const targetCharityId = charity?.id || charitiesList[0]?.id || "c1111111-1111-1111-1111-111111111111";
+    const updated = mockDb.createOrUpdateSubscription({
+      userId: currentUserId,
+      planType: subscription?.plan_type || "monthly",
+      charityId: targetCharityId,
+      charityPercentage: contributionPercent,
     });
+    setSubscription(updated);
     toast({
       type: "success",
       title: "Charity Tithe Updated",
       description: `Your monthly contribution is now set to ${contributionPercent}% of your subscription fee.`,
     });
+    loadCharityData();
   };
 
   const handleConfirmCharityChange = () => {
-    if (!subscription || !selectedNewCharityId) return;
-    mockDb.updateSubscription(subscription.id, {
-      charity_id: selectedNewCharityId,
+    const targetCharityId = selectedNewCharityId || charity?.id || charitiesList[0]?.id;
+    if (!targetCharityId) return;
+
+    if (charity && targetCharityId === charity.id) {
+      toast({
+        type: "info",
+        title: "Active Charity Unchanged",
+        description: `${charity.name} is already your selected cause.`,
+      });
+      setChangeModalOpen(false);
+      return;
+    }
+
+    const currentUserId = mockDb.getCurrentUser()?.id;
+    const updated = mockDb.createOrUpdateSubscription({
+      userId: currentUserId,
+      planType: subscription?.plan_type || "monthly",
+      charityId: targetCharityId,
+      charityPercentage: contributionPercent,
     });
-    const newC = mockDb.getCharityById(selectedNewCharityId);
+    setSubscription(updated);
+
+    const newC = mockDb.getCharityById(targetCharityId);
+    if (newC) {
+      setCharity(newC);
+    }
     toast({
       type: "success",
       title: "Beneficiary Cause Updated",
-      description: `Your subscription will now fund ${newC?.name}.`,
+      description: `Your subscription will now fund ${newC?.name || "the selected cause"}.`,
     });
     setChangeModalOpen(false);
     loadCharityData();
@@ -111,7 +143,7 @@ export default function CharityManagementPage() {
               </p>
             </div>
 
-            <Button variant="outline" size="sm" onClick={() => setChangeModalOpen(true)}>
+            <Button variant="outline" size="sm" onClick={handleOpenChangeModal}>
               Change Supported Cause
             </Button>
           </div>
@@ -144,7 +176,7 @@ export default function CharityManagementPage() {
                   </div>
                 </div>
 
-                <Button variant="outline" size="sm" onClick={() => setChangeModalOpen(true)}>
+                <Button variant="outline" size="sm" onClick={handleOpenChangeModal}>
                   Switch Charity
                 </Button>
               </div>
